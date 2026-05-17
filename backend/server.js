@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import alasql from 'alasql';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,219 +26,217 @@ alasql('CREATE TABLE tblFilm (Film_strCode STRING, Film_strTitle STRING, Film_st
 alasql('CREATE TABLE tblSession (Session_strCode STRING, Film_strCode STRING, Session_dtmShowing STRING, Screen_intNumber INT)');
 
 // Populate authentic films from SQL Server backup
-const filmRecords = [
-  {
-    Film_strCode: '0020000002',
-    Film_strTitle: 'Warfare',
-    Film_strCensor: 'A',
-    Film_intDuration: 140,
-    Film_strDescription: 'A raw, unfiltered look at modern combat as experienced by a platoon of Navy SEALs during a single night in Ramadi, Iraq.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNjI4MjJiMWYtYmRhMS00OGE0LWJkMjctODc1MDllYjBmMjQ5XkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://images.hdqwalls.com/wallpapers/warfare-movie-2025-4k-4h.jpg'
-  },
-  {
-    Film_strCode: '0020000003',
-    Film_strTitle: 'Sikandar',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 158,
-    Film_strDescription: 'A gripping action-thriller that follows a fearless warrior on an epic quest for justice. Salman Khan delivers a powerhouse performance as a man caught between duty and destiny.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BM2RmMDMwYzQtNjc2YS00NjRhLTgyNzUtMGZlYzIxODE1ZTk5XkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/03/Sikandar.jpg'
-  },
-  {
-    Film_strCode: '0020000004',
-    Film_strTitle: 'Thunderbolts*',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 158,
-    Film_strDescription: 'Marvel\'s most dangerous anti-heroes are forced to work together on a deadly mission that none of them signed up for.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNTg0OTljMjQtZWQxZi00OGIyLThlNjEtMjQ0ZTRjNTdmZjRkXkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://cdn.marvel.com/content/1x/thunderboltsasterisk_lob_crd_03.jpg'
-  },
-  {
-    Film_strCode: '0020000005',
-    Film_strTitle: 'Final Destination: Bloodlines',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 114,
-    Film_strDescription: 'Death returns with terrifying new designs in this blood-curdling installment. A young woman discovers she can see how people will die.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNmRjMTdhODAtZTMxNS00OTc2LWI0ODktMzQ3Njk2MTBjODk4XkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://images.hdqwalls.com/wallpapers/final-destination-bloodlines-2025-4k-cd.jpg'
-  },
-  {
-    Film_strCode: 'HO00002714',
-    Film_strTitle: 'Deva',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 162,
-    Film_strDescription: 'Dev Ambre Rathore is a brilliant but unorthodox cop who dives headfirst into Mumbai\'s criminal underworld.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BYmI0NjA5NzgtYzY3MC00NDVjLWFiOTMtNDA0MTM1YjkwZTBiXkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://stat4.bollywoodhungama.in/wp-content/uploads/2025/01/Deva-4.jpg'
-  },
-  {
-    Film_strCode: 'HO00003138',
-    Film_strTitle: 'Fateh',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 140,
-    Film_strDescription: 'A retired special-ops agent leads a solitary life until a young girl falls victim to a ruthless cybercrime syndicate.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMWIzMGJkNjItMjQyOC00ZjFhLWExNTktNDFiMjk2NTQ4NDg2XkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/01/Fateh-16.jpg'
-  },
-  {
-    Film_strCode: 'HO00002829',
-    Film_strTitle: 'Pushpa 2: The Rule',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 182,
-    Film_strDescription: 'The clash between Pushpa Raj and SP Bhanwar Singh Shekhawat continues in this high-octane sequel.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BN2JiMTkyYzktNzg4Ny00OTVkLTk0MGEtN2ZlYjdiN2Q1ZjNhXkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2024/04/Pushpa-2-%E2%80%93-The-Rule-1.jpeg'
-  },
-  {
-    Film_strCode: 'HO00003034',
-    Film_strTitle: 'Singham Again',
-    Film_strCensor: 'U/A',
-    Film_intDuration: 164,
-    Film_strDescription: 'Bajirao Singham is back in Rohit Shetty\'s expanded cop universe, joined by India\'s top officers on a high-stakes cross-border mission.',
-    Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMGUyMjc3YTUtMTU4My00MTliLThkM2UtN2FhYjFiNzI0MGFmXkEyXkFqcGc@._V1_.jpg',
-    Film_strURL4: 'https://static.toiimg.com/photo/114757116.jpeg'
-  }
-];
+// Dynamic database import from SQL Server export
+let filmRecords = [];
+let sessionRecords = [];
 
-alasql('INSERT INTO tblFilm SELECT * FROM ?', [filmRecords]);
-
-// Populate authentic sessions including showtimes for all movies!
-const sessionRecords = [
-  // Now Showing Movies
-  { Session_strCode: 's1_1', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T10:30:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_2', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T13:45:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_3', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T17:00:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_4', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T20:15:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_5', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T10:30:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_6', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T13:45:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_7', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T17:00:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_8', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T20:15:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_9', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T13:45:00', Screen_intNumber: 1 },
-  { Session_strCode: 's1_10', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T20:15:00', Screen_intNumber: 1 },
-  { Session_strCode: 's2_1', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T11:00:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_2', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T14:15:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_3', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T17:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_4', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T20:45:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_5', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T11:00:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_6', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T14:15:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_7', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T17:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 's2_8', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T20:45:00', Screen_intNumber: 2 },
-  { Session_strCode: 's3_1', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T12:00:00', Screen_intNumber: 1 },
-  { Session_strCode: 's3_2', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T15:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 's3_3', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T12:00:00', Screen_intNumber: 1 },
-  { Session_strCode: 's3_4', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T15:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 's4_1', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T10:00:00', Screen_intNumber: 2 },
-  { Session_strCode: 's4_2', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T16:00:00', Screen_intNumber: 2 },
-  { Session_strCode: 's4_3', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T10:00:00', Screen_intNumber: 2 },
-  { Session_strCode: 's4_4', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T16:00:00', Screen_intNumber: 2 },
-
-  // Coming Soon Movies (Dynamic showtimes added for awesome demo experience!)
-  // Carry On Jatta 2 (HO00003138)
-  { Session_strCode: 'sc_1_1', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T11:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 'sc_1_2', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T15:45:00', Screen_intNumber: 1 },
-  { Session_strCode: 'sc_1_3', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T11:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 'sc_1_4', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T18:15:00', Screen_intNumber: 1 },
-
-  // Dangal (HO00002714)
-  { Session_strCode: 'sc_2_1', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-05T12:30:00', Screen_intNumber: 1 },
-  { Session_strCode: 'sc_2_2', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-06T15:45:00', Screen_intNumber: 2 },
-
-  // Baahubali 2: The Conclusion (HO00002829)
-  { Session_strCode: 'sc_3_1', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-05T14:00:00', Screen_intNumber: 1 },
-  { Session_strCode: 'sc_3_2', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-06T20:30:00', Screen_intNumber: 2 },
-
-  // Tiger Zinda Hai (HO00003034)
-  { Session_strCode: 'sc_4_1', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-05T16:30:00', Screen_intNumber: 2 },
-  { Session_strCode: 'sc_4_2', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-06T19:45:00', Screen_intNumber: 1 }
-];
-
-alasql('INSERT INTO tblSession SELECT * FROM ?', [sessionRecords]);
-console.log('[SUCCESS] Self-contained pure SQL database initialized successfully!');
-
-// Local, premium metadata mapping for details overlay
-const FILM_METADATA = {
-  '0020000002': {
-    title: 'Warfare',
-    synopsis: 'A raw, unfiltered look at modern combat as experienced by a platoon of Navy SEALs during a single night in Ramadi, Iraq.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BNjI4MjJiMWYtYmRhMS00OGE0LWJkMjctODc1MDllYjBmMjQ5XkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://images.hdqwalls.com/wallpapers/warfare-movie-2025-4k-4h.jpg',
-    genre: 'Action / War / Thriller',
-    language: 'English',
-    cast: ['Navy SEAL Platoon'],
-    director: 'Alex Garland',
-  },
-  '0020000003': {
-    title: 'Sikandar',
-    synopsis: 'A gripping action-thriller that follows a fearless warrior on an epic quest for justice. Salman Khan delivers a powerhouse performance as a man caught between duty and destiny.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BM2RmMDMwYzQtNjc2YS00NjRhLTgyNzUtMGZlYzIxODE1ZTk5XkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/03/Sikandar.jpg',
-    genre: 'Action / Thriller / Drama',
-    language: 'Hindi',
-    cast: ['Salman Khan', 'Rashmika Mandanna', 'Kajal Aggarwal', 'Sathyaraj'],
-    director: 'A.R. Murugadoss',
-  },
-  '0020000004': {
-    title: 'Thunderbolts*',
-    synopsis: 'Marvel\'s most dangerous anti-heroes are forced to work together on a deadly mission that none of them signed up for.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BNTg0OTljMjQtZWQxZi00OGIyLThlNjEtMjQ0ZTRjNTdmZjRkXkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://cdn.marvel.com/content/1x/thunderboltsasterisk_lob_crd_03.jpg',
-    genre: 'Action / Adventure / Sci-Fi',
-    language: 'English',
-    cast: ['Florence Pugh', 'Sebastian Stan', 'David Harbour', 'Wyatt Russell', 'Olga Kurylenko', 'Hannah John-Kamen', 'Julia Louis-Dreyfus'],
-    director: 'Jake Schreier',
-  },
-  '0020000005': {
-    title: 'Final Destination: Bloodlines',
-    synopsis: 'Death returns with terrifying new designs in this blood-curdling installment. A young woman discovers she can see how people will die.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BNmRjMTdhODAtZTMxNS00OTc2LWI0ODktMzQ3Njk2MTBjODk4XkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://images.hdqwalls.com/wallpapers/final-destination-bloodlines-2025-4k-cd.jpg',
-    genre: 'Horror / Mystery / Thriller',
-    language: 'English',
-    cast: ['Brec Bassinger', 'Teo Briones', 'Kaitlyn Santa Juana', 'Richard Harmon'],
-    director: 'Zach Lipovsky, Adam B. Stein',
-  },
-  'HO00002714': {
-    title: 'Deva',
-    synopsis: 'Dev Ambre Rathore is a brilliant but unorthodox cop who dives headfirst into Mumbai\'s criminal underworld.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BYmI0NjA5NzgtYzY3MC00NDVjLWFiOTMtNDA0MTM1YjkwZTBiXkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://stat4.bollywoodhungama.in/wp-content/uploads/2025/01/Deva-4.jpg',
-    genre: 'Action / Drama',
-    language: 'Hindi',
-    cast: ['Shahid Kapoor', 'Pooja Hegde', 'Pavail Gulati'],
-    director: 'Rosshan Andrrews',
-  },
-  'HO00003138': {
-    title: 'Fateh',
-    synopsis: 'A retired special-ops agent leads a solitary life until a young girl falls victim to a ruthless cybercrime syndicate.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BMWIzMGJkNjItMjQyOC00ZjFhLWExNTktNDFiMjk2NTQ4NDg2XkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/01/Fateh-16.jpg',
-    genre: 'Action / Thriller',
-    language: 'Hindi',
-    cast: ['Sonu Sood', 'Jacqueline Fernandez', 'Naseeruddin Shah'],
-    director: 'Sonu Sood',
-  },
-  'HO00002829': {
-    title: 'Pushpa 2: The Rule',
-    synopsis: 'The clash between Pushpa Raj and SP Bhanwar Singh Shekhawat continues in this high-octane sequel.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BN2JiMTkyYzktNzg4Ny00OTVkLTk0MGEtN2ZlYjdiN2Q1ZjNhXkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2024/04/Pushpa-2-%E2%80%93-The-Rule-1.jpeg',
-    genre: 'Action / Drama / Thriller',
-    language: 'Telugu / Hindi / Tamil',
-    cast: ['Allu Arjun', 'Fahadh Faasil', 'Rashmika Mandanna'],
-    director: 'Sukumar',
-  },
-  'HO00003034': {
-    title: 'Singham Again',
-    synopsis: 'Bajirao Singham is back in Rohit Shetty\'s expanded cop universe, joined by India\'s top officers on a high-stakes cross-border mission.',
-    posterUrl: 'https://m.media-amazon.com/images/M/MV5BMGUyMjc3YTUtMTU4My00MTliLThkM2UtN2FhYjFiNzI0MGFmXkEyXkFqcGc@._V1_.jpg',
-    backdropUrl: 'https://static.toiimg.com/photo/114757116.jpeg',
-    genre: 'Action / Crime / Thriller',
-    language: 'Hindi',
-    cast: ['Ajay Devgn', 'Kareena Kapoor Khan', 'Ranveer Singh', 'Akshay Kumar', 'Deepika Padukone', 'Tiger Shroff', 'Arjun Kapoor'],
-    director: 'Rohit Shetty',
-  }
+const KNOWN_METADATA = {
+  '0020000002': { genre: 'Action / War / Thriller', language: 'English', cast: ['Navy SEAL Platoon'], director: 'Alex Garland' },
+  '0020000003': { genre: 'Action / Thriller / Drama', language: 'Hindi', cast: ['Salman Khan', 'Rashmika Mandanna', 'Kajal Aggarwal', 'Sathyaraj'], director: 'A.R. Murugadoss' },
+  '0020000004': { genre: 'Action / Adventure / Sci-Fi', language: 'English', cast: ['Florence Pugh', 'Sebastian Stan', 'David Harbour', 'Wyatt Russell'], director: 'Jake Schreier' },
+  '0020000005': { genre: 'Horror / Mystery / Thriller', language: 'English', cast: ['Brec Bassinger', 'Teo Briones', 'Kaitlyn Santa Juana'], director: 'Zach Lipovsky, Adam B. Stein' },
+  'HO00002714': { genre: 'Action / Drama', language: 'Hindi', cast: ['Shahid Kapoor', 'Pooja Hegde', 'Pavail Gulati'], director: 'Rosshan Andrrews' },
+  'HO00003138': { genre: 'Action / Thriller', language: 'Hindi', cast: ['Sonu Sood', 'Jacqueline Fernandez', 'Naseeruddin Shah'], director: 'Sonu Sood' },
+  'HO00002829': { genre: 'Action / Drama / Thriller', language: 'Telugu / Hindi / Tamil', cast: ['Allu Arjun', 'Fahadh Faasil', 'Rashmika Mandanna'], director: 'Sukumar' },
+  'HO00003034': { genre: 'Action / Crime / Thriller', language: 'Hindi', cast: ['Ajay Devgn', 'Kareena Kapoor Khan', 'Ranveer Singh'], director: 'Rohit Shetty' }
 };
+
+const FILM_METADATA = {};
+
+try {
+  const exportPath = path.join(__dirname, 'rajpal_database_export.json');
+  if (fs.existsSync(exportPath)) {
+    console.log('[DATABASE] Loading database records from rajpal_database_export.json...');
+    const rawData = fs.readFileSync(exportPath, 'utf8');
+    const dbData = JSON.parse(rawData);
+
+    // Map Now Showing films from database export
+    if (dbData.nowShowingFilms) {
+      dbData.nowShowingFilms.forEach(f => {
+        filmRecords.push({
+          Film_strCode: f.id.toString().trim(),
+          Film_strTitle: f.title.trim(),
+          Film_strCensor: f.rating || 'UA',
+          Film_intDuration: f.durationMinutes || 120,
+          Film_strDescription: f.synopsis || 'No description available.',
+          Film_strURL3: f.posterUrl,
+          Film_strURL4: f.backdropUrl
+        });
+      });
+    }
+
+    // Map Coming Soon films from database export
+    if (dbData.comingSoonFilms) {
+      dbData.comingSoonFilms.forEach(f => {
+        filmRecords.push({
+          Film_strCode: f.id.toString().trim(),
+          Film_strTitle: f.title.trim(),
+          Film_strCensor: f.rating || 'UA',
+          Film_intDuration: f.durationMinutes || 120,
+          Film_strDescription: f.synopsis || 'No description available.',
+          Film_strURL3: f.posterUrl,
+          Film_strURL4: f.backdropUrl
+        });
+      });
+    }
+
+    // Map sessions from database export
+    if (dbData.activeShowtimeSessions) {
+      dbData.activeShowtimeSessions.forEach(s => {
+        const cleanTime = s.originalShowtime ? s.originalShowtime.replace(/\.\d+Z$/, '').replace('Z', '') : '';
+        sessionRecords.push({
+          Session_strCode: s.sessionId.toString().trim(),
+          Film_strCode: s.filmId.toString().trim(),
+          Session_dtmShowing: cleanTime,
+          Screen_intNumber: s.screenNumber || 1
+        });
+      });
+    }
+
+    console.log(`[DATABASE SUCCESS] Loaded ${filmRecords.length} films and ${sessionRecords.length} sessions directly from Vista database export!`);
+  }
+} catch (e) {
+  console.error('[DATABASE ERROR] Failed to load data from database export:', e);
+}
+
+// Fallback static records in case the database export is missing or corrupt
+if (filmRecords.length === 0) {
+  console.log('[DATABASE WARNING] Database export not found. Loading fallback records...');
+  filmRecords = [
+    {
+      Film_strCode: '0020000002',
+      Film_strTitle: 'Warfare',
+      Film_strCensor: 'A',
+      Film_intDuration: 140,
+      Film_strDescription: 'A raw, unfiltered look at modern combat as experienced by a platoon of Navy SEALs during a single night in Ramadi, Iraq.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNjI4MjJiMWYtYmRhMS00OGE0LWJkMjctODc1MDllYjBmMjQ5XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://images.hdqwalls.com/wallpapers/warfare-movie-2025-4k-4h.jpg'
+    },
+    {
+      Film_strCode: '0020000003',
+      Film_strTitle: 'Sikandar',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 158,
+      Film_strDescription: 'A gripping action-thriller that follows a fearless warrior on an epic quest for justice. Salman Khan delivers a powerhouse performance as a man caught between duty and destiny.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BM2RmMDMwYzQtNjc2YS00NjRhLTgyNzUtMGZlYzIxODE1ZTk5XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/03/Sikandar.jpg'
+    },
+    {
+      Film_strCode: '0020000004',
+      Film_strTitle: 'Thunderbolts*',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 158,
+      Film_strDescription: 'Marvel\'s most dangerous anti-heroes are forced to work together on a deadly mission that none of them signed up for.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNTg0OTljMjQtZWQxZi00OGIyLThlNjEtMjQ0ZTRjNTdmZjRkXkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://cdn.marvel.com/content/1x/thunderboltsasterisk_lob_crd_03.jpg'
+    },
+    {
+      Film_strCode: '0020000005',
+      Film_strTitle: 'Final Destination: Bloodlines',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 114,
+      Film_strDescription: 'Death returns with terrifying new designs in this blood-curdling installment. A young woman discovers she can see how people will die.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNmRjMTdhODAtZTMxNS00OTc2LWI0ODktMzQ3Njk2MTBjODk4XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://images.hdqwalls.com/wallpapers/final-destination-bloodlines-2025-4k-cd.jpg'
+    },
+    {
+      Film_strCode: 'HO00002714',
+      Film_strTitle: 'Deva',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 162,
+      Film_strDescription: 'Dev Ambre Rathore is a brilliant but unorthodox cop who dives headfirst into Mumbai\'s criminal underworld.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BYmI0NjA5NzgtYzY3MC00NDVjLWFiOTMtNDA0MTM1YjkwZTBiXkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://stat4.bollywoodhungama.in/wp-content/uploads/2025/01/Deva-4.jpg'
+    },
+    {
+      Film_strCode: 'HO00003138',
+      Film_strTitle: 'Fateh',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 140,
+      Film_strDescription: 'A retired special-ops agent leads a solitary life until a young girl falls victim to a ruthless cybercrime syndicate.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMWIzMGJkNjItMjQyOC00ZjFhLWExNTktNDFiMjk2NTQ4NDg2XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/01/Fateh-16.jpg'
+    },
+    {
+      Film_strCode: 'HO00002829',
+      Film_strTitle: 'Pushpa 2: The Rule',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 182,
+      Film_strDescription: 'The clash between Pushpa Raj and SP Bhanwar Singh Shekhawat continues in this high-octane sequel.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BN2JiMTkyYzktNzg4Ny00OTVkLTk0MGEtN2ZlYjdiN2Q1ZjNhXkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2024/04/Pushpa-2-%E2%80%93-The-Rule-1.jpeg'
+    },
+    {
+      Film_strCode: 'HO00003034',
+      Film_strTitle: 'Singham Again',
+      Film_strCensor: 'U/A',
+      Film_intDuration: 164,
+      Film_strDescription: 'Bajirao Singham is back in Rohit Shetty\'s expanded cop universe, joined by India\'s top officers on a high-stakes cross-border mission.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMGUyMjc3YTUtMTU4My00MTliLThkM2UtN2FhYjFiNzI0MGFmXkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://static.toiimg.com/photo/114757116.jpeg'
+    }
+  ];
+
+  sessionRecords = [
+    { Session_strCode: 's1_1', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T10:30:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_2', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T13:45:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_3', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T17:00:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_4', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T20:15:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_5', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T10:30:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_6', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T13:45:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_7', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T17:00:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_8', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T20:15:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_9', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T13:45:00', Screen_intNumber: 1 },
+    { Session_strCode: 's1_10', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T20:15:00', Screen_intNumber: 1 },
+    { Session_strCode: 's2_1', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T11:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_2', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T14:15:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_3', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T17:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_4', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T20:45:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_5', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T11:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_6', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T14:15:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_7', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T17:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 's2_8', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T20:45:00', Screen_intNumber: 2 },
+    { Session_strCode: 's3_1', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T12:00:00', Screen_intNumber: 1 },
+    { Session_strCode: 's3_2', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T15:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 's3_3', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T12:00:00', Screen_intNumber: 1 },
+    { Session_strCode: 's3_4', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T15:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 's4_1', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T10:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 's4_2', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T16:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 's4_3', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T10:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 's4_4', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T16:00:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_1_1', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T11:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_1_2', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T15:45:00', Screen_intNumber: 1 },
+    { Session_strCode: 'sc_1_3', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T11:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_1_4', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T18:15:00', Screen_intNumber: 1 },
+    { Session_strCode: 'sc_2_1', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-05T12:30:00', Screen_intNumber: 1 },
+    { Session_strCode: 'sc_2_2', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-06T15:45:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_3_1', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-05T14:00:00', Screen_intNumber: 1 },
+    { Session_strCode: 'sc_3_2', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-06T20:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_4_1', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-05T16:30:00', Screen_intNumber: 2 },
+    { Session_strCode: 'sc_4_2', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-06T19:45:00', Screen_intNumber: 1 }
+  ];
+}
+
+// Populate Alasql tables
+alasql('INSERT INTO tblFilm SELECT * FROM ?', [filmRecords]);
+alasql('INSERT INTO tblSession SELECT * FROM ?', [sessionRecords]);
+
+// Dynamically generate film metadata mapping for all loaded films
+filmRecords.forEach(f => {
+  const known = KNOWN_METADATA[f.Film_strCode] || { genre: 'Action / Drama', language: 'Hindi', cast: [], director: 'Unknown' };
+  FILM_METADATA[f.Film_strCode] = {
+    title: f.Film_strTitle,
+    synopsis: f.Film_strDescription,
+    posterUrl: f.Film_strURL3,
+    backdropUrl: f.Film_strURL4,
+    genre: known.genre,
+    language: known.language,
+    cast: known.cast,
+    director: known.director
+  };
+});
+
+console.log('[SUCCESS] Database tables and movie metadata loaded successfully!');
 
 // In-Memory Bookings Store
 const bookings = [];
