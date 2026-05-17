@@ -31,14 +31,14 @@ let filmRecords = [];
 let sessionRecords = [];
 
 const KNOWN_METADATA = {
-  '0020000002': { genre: 'Action / War / Thriller', language: 'English', cast: ['Navy SEAL Platoon'], director: 'Alex Garland' },
-  '0020000003': { genre: 'Action / Thriller / Drama', language: 'Hindi', cast: ['Salman Khan', 'Rashmika Mandanna', 'Kajal Aggarwal', 'Sathyaraj'], director: 'A.R. Murugadoss' },
-  '0020000004': { genre: 'Action / Adventure / Sci-Fi', language: 'English', cast: ['Florence Pugh', 'Sebastian Stan', 'David Harbour', 'Wyatt Russell'], director: 'Jake Schreier' },
-  '0020000005': { genre: 'Horror / Mystery / Thriller', language: 'English', cast: ['Brec Bassinger', 'Teo Briones', 'Kaitlyn Santa Juana'], director: 'Zach Lipovsky, Adam B. Stein' },
-  'HO00002714': { genre: 'Action / Drama', language: 'Hindi', cast: ['Shahid Kapoor', 'Pooja Hegde', 'Pavail Gulati'], director: 'Rosshan Andrrews' },
-  'HO00003138': { genre: 'Action / Thriller', language: 'Hindi', cast: ['Sonu Sood', 'Jacqueline Fernandez', 'Naseeruddin Shah'], director: 'Sonu Sood' },
-  'HO00002829': { genre: 'Action / Drama / Thriller', language: 'Telugu / Hindi / Tamil', cast: ['Allu Arjun', 'Fahadh Faasil', 'Rashmika Mandanna'], director: 'Sukumar' },
-  'HO00003034': { genre: 'Action / Crime / Thriller', language: 'Hindi', cast: ['Ajay Devgn', 'Kareena Kapoor Khan', 'Ranveer Singh'], director: 'Rohit Shetty' }
+  '0020000002': { genre: 'Drama / Comedy / Musical', language: 'Punjabi', cast: ['Gippy Grewal', 'Neeru Bajwa', 'Karamjit Anmol', 'Gurpreet Ghuggi'], director: 'Vijay Kumar Arora' },
+  '0020000003': { genre: 'Action / Crime / Thriller', language: 'Hindi', cast: ['Akshay Kumar', 'Katrina Kaif', 'Ajay Devgn', 'Ranveer Singh'], director: 'Rohit Shetty' },
+  '0020000004': { genre: 'Comedy / Drama / Romance', language: 'Punjabi', cast: ['Diljit Dosanjh', 'Shehnaaz Gill', 'Sonam Bajwa', 'Shinda Grewal'], director: 'Amarjit Singh Saron' },
+  '0020000005': { genre: 'Comedy / Family / Drama', language: 'Punjabi', cast: ['Binnu Dhillon', 'Gurnam Bhullar', 'Jaswinder Bhalla'], director: 'Pankaj Batra' },
+  'HO00002714': { genre: 'Biography / Drama / Sport', language: 'Hindi', cast: ['Aamir Khan', 'Sakshi Tanwar', 'Fatima Sana Shaikh'], director: 'Nitesh Tiwari' },
+  'HO00003138': { genre: 'Comedy / Drama', language: 'Punjabi', cast: ['Gippy Grewal', 'Sonam Bajwa', 'Gurpreet Ghuggi'], director: 'Smeep Kang' },
+  'HO00002829': { genre: 'Action / Widescreen / Fantasy', language: 'Hindi / Telugu', cast: ['Prabhas', 'Rana Daggubati', 'Anushka Shetty'], director: 'S. S. Rajamouli' },
+  'HO00003034': { genre: 'Action / Adventure / Thriller', language: 'Hindi', cast: ['Salman Khan', 'Katrina Kaif', 'Sajjad Delafrooz'], director: 'Ali Abbas Zafar' }
 };
 
 const FILM_METADATA = {};
@@ -105,75 +105,75 @@ if (filmRecords.length === 0) {
   filmRecords = [
     {
       Film_strCode: '0020000002',
-      Film_strTitle: 'Warfare',
+      Film_strTitle: 'Pani Ch Madhaani',
       Film_strCensor: 'A',
       Film_intDuration: 140,
-      Film_strDescription: 'A raw, unfiltered look at modern combat as experienced by a platoon of Navy SEALs during a single night in Ramadi, Iraq.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNjI4MjJiMWYtYmRhMS00OGE0LWJkMjctODc1MDllYjBmMjQ5XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://images.hdqwalls.com/wallpapers/warfare-movie-2025-4k-4h.jpg'
+      Film_strDescription: 'Set in the 1980s, a struggling group of Punjabi musicians search for fame, love, and their big breakthrough in the UK, leading to a series of unexpected events.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMDFkNGMwNjEtOGMzYi00MTc0LThkNDItZmNmZmY2MzE4MjQ4XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://i.ytimg.com/vi/GzI87o-Lslc/maxresdefault.jpg'
     },
     {
       Film_strCode: '0020000003',
-      Film_strTitle: 'Sikandar',
+      Film_strTitle: 'Sooryavanshi',
       Film_strCensor: 'U/A',
       Film_intDuration: 158,
-      Film_strDescription: 'A gripping action-thriller that follows a fearless warrior on an epic quest for justice. Salman Khan delivers a powerhouse performance as a man caught between duty and destiny.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BM2RmMDMwYzQtNjc2YS00NjRhLTgyNzUtMGZlYzIxODE1ZTk5XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/03/Sikandar.jpg'
+      Film_strDescription: 'A daredevil Mumbai cop joins forces with two legendary officers to stop a major terror plot threatening the city, packing high-octane stunts and blockbuster entertainment.',
+      Film_strURL3: 'https://image.tmdb.org/t/p/w500/8425gJv18V86n2tYQ5o0h745y8S.jpg',
+      Film_strURL4: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg'
     },
     {
       Film_strCode: '0020000004',
-      Film_strTitle: 'Thunderbolts*',
+      Film_strTitle: 'Honsla Rakh',
       Film_strCensor: 'U/A',
       Film_intDuration: 158,
-      Film_strDescription: 'Marvel\'s most dangerous anti-heroes are forced to work together on a deadly mission that none of them signed up for.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNTg0OTljMjQtZWQxZi00OGIyLThlNjEtMjQ0ZTRjNTdmZjRkXkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://cdn.marvel.com/content/1x/thunderboltsasterisk_lob_crd_03.jpg'
+      Film_strDescription: 'A single father navigates the struggles of parenting and dating in modern Vancouver, only for his ex-wife to suddenly reappear in his life causing a hilarious love-triangle.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BYzg0YmRlZTUtYzVkYS00OTlhLTlhOWUtNDQ3MDAxY2EwYmU0XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://image.tmdb.org/t/p/original/mN71w2Cq80dZkYjY6H3yC76GgWb.jpg'
     },
     {
       Film_strCode: '0020000005',
-      Film_strTitle: 'Final Destination: Bloodlines',
+      Film_strTitle: 'Fuffad Ji',
       Film_strCensor: 'U/A',
       Film_intDuration: 114,
-      Film_strDescription: 'Death returns with terrifying new designs in this blood-curdling installment. A young woman discovers she can see how people will die.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BNmRjMTdhODAtZTMxNS00OTc2LWI0ODktMzQ3Njk2MTBjODk4XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://images.hdqwalls.com/wallpapers/final-destination-bloodlines-2025-4k-cd.jpg'
+      Film_strDescription: 'A satirical comedy about family rivalry, ego, and local politics in a traditional Punjabi household as a newlywed son-in-law challenges his senior brother-in-law.',
+      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMjA5OTdiYzAtNjliMy00NjcyLTlhMDYtZjhmMWZmNjg5NmY1XkEyXkFqcGc@._V1_.jpg',
+      Film_strURL4: 'https://i.ytimg.com/vi/aZ3CgI1mYmg/maxresdefault.jpg'
     },
     {
       Film_strCode: 'HO00002714',
-      Film_strTitle: 'Deva',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 162,
-      Film_strDescription: 'Dev Ambre Rathore is a brilliant but unorthodox cop who dives headfirst into Mumbai\'s criminal underworld.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BYmI0NjA5NzgtYzY3MC00NDVjLWFiOTMtNDA0MTM1YjkwZTBiXkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://stat4.bollywoodhungama.in/wp-content/uploads/2025/01/Deva-4.jpg'
+      Film_strTitle: 'Dangal',
+      Film_strCensor: 'U',
+      Film_intDuration: 161,
+      Film_strDescription: 'A former wrestler trains his daughters to become world-class champions against all social odds, leading them to India\'s first-ever gold medal in wrestling.',
+      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg',
+      Film_strURL4: 'https://i.ytimg.com/vi/x_7YlGv9u1g/maxresdefault.jpg'
     },
     {
       Film_strCode: 'HO00003138',
-      Film_strTitle: 'Fateh',
+      Film_strTitle: 'Carry On Jatta 2',
       Film_strCensor: 'U/A',
-      Film_intDuration: 140,
-      Film_strDescription: 'A retired special-ops agent leads a solitary life until a young girl falls victim to a ruthless cybercrime syndicate.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMWIzMGJkNjItMjQyOC00ZjFhLWExNTktNDFiMjk2NTQ4NDg2XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2025/01/Fateh-16.jpg'
+      Film_intDuration: 135,
+      Film_strDescription: 'A hilarious comedy of errors as a young orphan tries to win the heart of a girl who only wants to marry a man with a large family, resulting in chaos and confusion.',
+      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Carry_On_Jatta_2.jpg',
+      Film_strURL4: 'https://i.ytimg.com/vi/F-tC40rA8h4/maxresdefault.jpg'
     },
     {
       Film_strCode: 'HO00002829',
-      Film_strTitle: 'Pushpa 2: The Rule',
+      Film_strTitle: 'Baahubali 2: The Conclusion',
       Film_strCensor: 'U/A',
-      Film_intDuration: 182,
-      Film_strDescription: 'The clash between Pushpa Raj and SP Bhanwar Singh Shekhawat continues in this high-octane sequel.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BN2JiMTkyYzktNzg4Ny00OTVkLTk0MGEtN2ZlYjdiN2Q1ZjNhXkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://stat5.bollywoodhungama.in/wp-content/uploads/2024/04/Pushpa-2-%E2%80%93-The-Rule-1.jpeg'
+      Film_intDuration: 167,
+      Film_strDescription: 'The epic conclusion to the saga of Mahendra Baahubali and his quest to reclaim the throne of Mahishmati while uncovering the dark secrets of his legendary father\'s murder.',
+      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Baahubali_2_The_Conclusion_poster.jpg',
+      Film_strURL4: 'https://image.tmdb.org/t/p/original/2w8gD8M4w4wX3v0S9yX6w2B8w.jpg'
     },
     {
       Film_strCode: 'HO00003034',
-      Film_strTitle: 'Singham Again',
+      Film_strTitle: 'Tiger Zinda Hai',
       Film_strCensor: 'U/A',
-      Film_intDuration: 164,
-      Film_strDescription: 'Bajirao Singham is back in Rohit Shetty\'s expanded cop universe, joined by India\'s top officers on a high-stakes cross-border mission.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMGUyMjc3YTUtMTU4My00MTliLThkM2UtN2FhYjFiNzI0MGFmXkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://static.toiimg.com/photo/114757116.jpeg'
+      Film_intDuration: 161,
+      Film_strDescription: 'A massive action espionage thriller following super spies Tiger and Zoya as they team up to rescue a group of Indian and Pakistani nurses held hostage in Iraq.',
+      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/2/23/Tiger_Zinda_Hai_poster.jpg',
+      Film_strURL4: 'https://image.tmdb.org/t/p/original/6t3T1e82E8m92S8e2T0w2E6mE8g.jpg'
     }
   ];
 

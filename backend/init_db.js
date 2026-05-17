@@ -51,8 +51,8 @@ db.serialize(() => {
       'A',
       140,
       'Set in the 1980s, a struggling group of Punjabi musicians search for fame, love, and their big breakthrough in the UK, leading to a series of unexpected events.',
-      '/images/pani_ch_madhaani_poster.svg',
-      '/images/pani_ch_madhaani_backdrop.svg'
+      'https://m.media-amazon.com/images/M/MV5BMDFkNGMwNjEtOGMzYi00MTc0LThkNDItZmNmZmY2MzE4MjQ4XkEyXkFqcGc@._V1_.jpg',
+      'https://i.ytimg.com/vi/GzI87o-Lslc/maxresdefault.jpg'
     ],
     [
       '0020000003',
@@ -60,8 +60,8 @@ db.serialize(() => {
       'U/A',
       158,
       'A daredevil Mumbai cop joins forces with two legendary officers to stop a major terror plot threatening the city, packing high-octane stunts and blockbuster entertainment.',
-      '/images/sooryavanshi_poster.svg',
-      '/images/sooryavanshi_backdrop.svg'
+      'https://image.tmdb.org/t/p/w500/8425gJv18V86n2tYQ5o0h745y8S.jpg',
+      'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg'
     ],
     [
       '0020000004',
@@ -69,8 +69,8 @@ db.serialize(() => {
       'U/A',
       158,
       'A single father navigates the struggles of parenting and dating in modern Vancouver, only for his ex-wife to suddenly reappear in his life causing a hilarious love-triangle.',
-      '/images/honsla_rakh_poster.svg',
-      '/images/honsla_rakh_backdrop.svg'
+      'https://m.media-amazon.com/images/M/MV5BYzg0YmRlZTUtYzVkYS00OTlhLTlhOWUtNDQ3MDAxY2EwYmU0XkEyXkFqcGc@._V1_.jpg',
+      'https://image.tmdb.org/t/p/original/mN71w2Cq80dZkYjY6H3yC76GgWb.jpg'
     ],
     [
       '0020000005',
@@ -78,8 +78,8 @@ db.serialize(() => {
       'U/A',
       114,
       'A satirical comedy about family rivalry, ego, and local politics in a traditional Punjabi household as a newlywed son-in-law challenges his senior brother-in-law.',
-      '/images/fuffad_ji_poster.svg',
-      '/images/fuffad_ji_backdrop.svg'
+      'https://m.media-amazon.com/images/M/MV5BMjA5OTdiYzAtNjliMy00NjcyLTlhMDYtZjhmMWZmNjg5NmY1XkEyXkFqcGc@._V1_.jpg',
+      'https://i.ytimg.com/vi/aZ3CgI1mYmg/maxresdefault.jpg'
     ],
     // Coming Soon
     [
@@ -88,8 +88,8 @@ db.serialize(() => {
       'U',
       161,
       'A former wrestler trains his daughters to become world-class champions against all social odds, leading them to India\'s first-ever gold medal in wrestling.',
-      '/images/dangal_poster.svg',
-      '/images/dangal_backdrop.svg'
+      'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg',
+      'https://i.ytimg.com/vi/x_7YlGv9u1g/maxresdefault.jpg'
     ],
     [
       'HO00003138',
@@ -97,8 +97,8 @@ db.serialize(() => {
       'U/A',
       135,
       'A hilarious comedy of errors as a young orphan tries to win the heart of a girl who only wants to marry a man with a large family, resulting in chaos and confusion.',
-      '/images/carry_on_jatta_2_poster.svg',
-      '/images/carry_on_jatta_2_backdrop.svg'
+      'https://upload.wikimedia.org/wikipedia/en/e/eb/Carry_On_Jatta_2.jpg',
+      'https://i.ytimg.com/vi/F-tC40rA8h4/maxresdefault.jpg'
     ],
     [
       'HO00002829',
@@ -106,8 +106,8 @@ db.serialize(() => {
       'U/A',
       167,
       'The epic conclusion to the saga of Mahendra Baahubali and his quest to reclaim the throne of Mahishmati while uncovering the dark secrets of his legendary father\'s murder.',
-      '/images/baahubali_2_poster.svg',
-      '/images/baahubali_2_backdrop.svg'
+      'https://upload.wikimedia.org/wikipedia/en/f/f9/Baahubali_2_The_Conclusion_poster.jpg',
+      'https://image.tmdb.org/t/p/original/2w8gD8M4w4wX3v0S9yX6w2B8w.jpg'
     ],
     [
       'HO00003034',
@@ -115,8 +115,8 @@ db.serialize(() => {
       'U/A',
       161,
       'A massive action espionage thriller following super spies Tiger and Zoya as they team up to rescue a group of Indian and Pakistani nurses held hostage in Iraq.',
-      '/images/tiger_zinda_hai_poster.svg',
-      '/images/tiger_zinda_hai_backdrop.svg'
+      'https://upload.wikimedia.org/wikipedia/en/2/23/Tiger_Zinda_Hai_poster.jpg',
+      'https://image.tmdb.org/t/p/original/6t3T1e82E8m92S8e2T0w2E6mE8g.jpg'
     ]
   ];
 

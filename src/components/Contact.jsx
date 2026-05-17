@@ -18,7 +18,7 @@ export default function Contact() {
             <div className="contact-icon">📍</div>
             <div>
               <h4>Address</h4>
-              <p>New Grain Market, Malout Road<br />S.A.S. Nagar, Sri Muktsar Sahib<br />Punjab – 152026, India</p>
+              <p>Rajpal Complex, Malout Road<br />Near New Grain Market, S.A.S. Nagar<br />Sri Muktsar Sahib, Punjab – 152026</p>
             </div>
           </div>
           <div className="contact-item">
@@ -46,7 +46,7 @@ export default function Contact() {
 
         <motion.div className="contact-map" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.789!2d74.5167!3d30.4767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3919b5e5b5b5b5b5%3A0x1234567890abcdef!2sRajpal%20Cinema%2C%20Muktsar!5e0!3m2!1sen!2sin!4v1234567890"
+            src="https://maps.google.com/maps?q=Rajpal%20Cinema,%20Muktsar&t=&z=15&ie=UTF8&iwloc=&output=embed"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
