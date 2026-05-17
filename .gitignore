@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 *.BAK
+
+*.exe
+*backup.exe
