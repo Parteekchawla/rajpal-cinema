@@ -18,11 +18,13 @@ export default function FilmModal({ film, onClose }) {
     });
   }, [film.id]);
 
-  const dates = [...new Set(showtimes.map(s => s.date))];
-  const filteredShowtimes = showtimes.filter(s => s.date === selectedDate);
+  const dates = showtimes.map(s => ({ date: s.date, label: s.label }));
+  const selectedGroup = showtimes.find(s => s.date === selectedDate);
+  const filteredShowtimes = selectedGroup ? selectedGroup.shows : [];
 
   const handleSelectShowtime = async (st) => {
-    setSelectedShowtime(st);
+    const group = showtimes.find(g => g.date === selectedDate);
+    setSelectedShowtime({ ...st, dayLabel: group ? group.label : 'Today' });
     setSelectedSeats([]);
     const layout = await getSeatLayout(st.id);
     setSeatLayout(layout);
@@ -47,7 +49,7 @@ export default function FilmModal({ film, onClose }) {
       showtimeId: selectedShowtime.id,
       showtime: `${selectedShowtime.dayLabel} ${selectedShowtime.time}`,
       screen: selectedShowtime.screen,
-      seats: selectedSeats.map(s => s.label),
+      seats: selectedSeats.map(s => s.id),
       totalPrice,
     });
     setBookingResult(result);
@@ -107,18 +109,15 @@ export default function FilmModal({ film, onClose }) {
               <div className="showtimes-section">
                 <h4>🎟️ Select Showtime</h4>
                 <div className="showtime-dates">
-                  {dates.map(date => {
-                    const st = showtimes.find(s => s.date === date);
-                    return (
-                      <button
-                        key={date}
-                        className={`showtime-date-btn ${selectedDate === date ? 'active' : ''}`}
-                        onClick={() => setSelectedDate(date)}
-                      >
-                        {st?.dayLabel || date}
-                      </button>
-                    );
-                  })}
+                  {dates.map(d => (
+                    <button
+                      key={d.date}
+                      className={`showtime-date-btn ${selectedDate === d.date ? 'active' : ''}`}
+                      onClick={() => setSelectedDate(d.date)}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="showtime-list">

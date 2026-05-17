@@ -457,6 +457,8 @@ app.get('/api/films/:filmId/showtimes', (req, res) => {
         time: timeStr,
         screen: `Screen ${row.Screen_intNumber}`,
         originalTime: originalTime,
+        price: row.Screen_intNumber === 2 ? 180 : 250, // Realistic pricing based on screen
+        format: '2D' // Standard format
       });
     });
 
@@ -486,6 +488,9 @@ app.get('/api/seat-layouts/:showtimeId', (req, res) => {
           id: `${rowChar}${sNum}`,
           number: sNum,
           status: isBooked ? 'booked' : 'available',
+          label: `${rowChar}-${sNum}`,
+          price: rowIndex < 3 ? 180 : rowIndex < 7 ? 250 : 350, // Standard (rows A-C): ₹180, Executive (rows D-G): ₹250, Premium (rows H-J): ₹350
+          isAisle: sNum === 3 || sNum === 9 // Create aisles for nice aesthetics
         });
       }
 
@@ -507,9 +512,11 @@ app.get('/api/seat-layouts/:showtimeId', (req, res) => {
 
 // POST /api/orders
 app.post('/api/orders', (req, res) => {
-  const { showtimeId, filmId, seats, name, email, phone, ticketType } = req.body;
+  const { showtimeId, filmId, seats, phone, ticketType } = req.body;
+  const name = req.body.name || 'Guest User';
+  const email = req.body.email || 'guest@rajpalcinema.com';
 
-  if (!showtimeId || !filmId || !seats || !seats.length || !name || !email) {
+  if (!showtimeId || !filmId || !seats || !seats.length) {
     return res.status(400).json({ error: 'Missing required checkout information.' });
   }
 
@@ -540,8 +547,11 @@ app.post('/api/orders', (req, res) => {
     res.status(201).json({
       success: true,
       bookingId,
+      bookingReference: bookingId,
       filmTitle,
       seats,
+      showtime: req.body.showtime || 'Today',
+      totalPrice: req.body.totalPrice || 0,
       customerName: name,
       message: 'Booking completed successfully!',
     });
