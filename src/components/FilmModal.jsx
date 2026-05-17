@@ -40,7 +40,7 @@ export default function FilmModal({ film, onClose }) {
     );
   };
 
-  const totalPrice = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+  const totalPrice = selectedSeats.reduce((sum, s) => sum + (s.price || 180), 0);
 
   const handleConfirmBooking = async () => {
     const result = await createOrder({
@@ -169,7 +169,7 @@ export default function FilmModal({ film, onClose }) {
                         className={`seat ${seat.status} ${selectedSeats.find(s => s.id === seat.id) ? 'selected' : ''} ${seat.isAisle ? 'aisle' : ''}`}
                         onClick={() => toggleSeat(seat)}
                         disabled={seat.status !== 'available'}
-                        title={`${seat.label} - ₹${seat.price}`}
+                        title={`${seat.label || seat.id} - ₹${seat.price || 180}`}
                       >
                         {seat.isAisle ? '' : seat.number}
                       </button>
@@ -199,7 +199,7 @@ export default function FilmModal({ film, onClose }) {
                   </div>
                   <div className="booking-summary-row">
                     <span>Seats ({selectedSeats.length})</span>
-                    <span>{selectedSeats.map(s => s.label).join(', ')}</span>
+                    <span>{selectedSeats.map(s => s.label || s.id).join(', ')}</span>
                   </div>
                   <div className="booking-summary-row total">
                     <span>Total</span><span>₹{totalPrice}</span>
