@@ -1,0 +1,202 @@
+{
+  "databaseName": "RajpalVista (SQL Server Express)",
+  "exportedAt": "2026-05-17T06:57:37.486Z",
+  "nowShowingFilms": [
+    {
+      "id": "0020000002",
+      "title": "Warfare",
+      "rating": "A",
+      "durationMinutes": 140,
+      "synopsis": "A raw, unfiltered look at modern combat as experienced by a platoon of Navy SEALs during a single night in Ramadi, Iraq.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BNjI4MjJiMWYtYmRhMS00OGE0LWJkMjctODc1MDllYjBmMjQ5XkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://images.hdqwalls.com/wallpapers/warfare-movie-2025-4k-4h.jpg"
+    },
+    {
+      "id": "0020000003",
+      "title": "Sikandar",
+      "rating": "U/A",
+      "durationMinutes": 158,
+      "synopsis": "A gripping action-thriller that follows a fearless warrior on an epic quest for justice. Salman Khan delivers a powerhouse performance as a man caught between duty and destiny.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BM2RmMDMwYzQtNjc2YS00NjRhLTgyNzUtMGZlYzIxODE1ZTk5XkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://stat5.bollywoodhungama.in/wp-content/uploads/2025/03/Sikandar.jpg"
+    },
+    {
+      "id": "0020000004",
+      "title": "Thunderbolts*",
+      "rating": "U/A",
+      "durationMinutes": 158,
+      "synopsis": "Marvel's most dangerous anti-heroes are forced to work together on a deadly mission that none of them signed up for.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BNTg0OTljMjQtZWQxZi00OGIyLThlNjEtMjQ0ZTRjNTdmZjRkXkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://cdn.marvel.com/content/1x/thunderboltsasterisk_lob_crd_03.jpg"
+    },
+    {
+      "id": "0020000005",
+      "title": "Final Destination: Bloodlines",
+      "rating": "U/A",
+      "durationMinutes": 114,
+      "synopsis": "Death returns with terrifying new designs in this blood-curdling installment. A young woman discovers she can see how people will die.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BNmRjMTdhODAtZTMxNS00OTc2LWI0ODktMzQ3Njk2MTBjODk4XkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://images.hdqwalls.com/wallpapers/final-destination-bloodlines-2025-4k-cd.jpg"
+    }
+  ],
+  "comingSoonFilms": [
+    {
+      "id": "HO00002714",
+      "title": "Deva",
+      "rating": "U/A",
+      "durationMinutes": 162,
+      "synopsis": "Dev Ambre Rathore is a brilliant but unorthodox cop who dives headfirst into Mumbai's criminal underworld.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BYmI0NjA5NzgtYzY3MC00NDVjLWFiOTMtNDA0MTM1YjkwZTBiXkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://stat4.bollywoodhungama.in/wp-content/uploads/2025/01/Deva-4.jpg"
+    },
+    {
+      "id": "HO00002829",
+      "title": "Pushpa 2: The Rule",
+      "rating": "U/A",
+      "durationMinutes": 4,
+      "synopsis": "The clash between Pushpa Raj and SP Bhanwar Singh Shekhawat continues in this high-octane sequel.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BN2JiMTkyYzktNzg4Ny00OTVkLTk0MGEtN2ZlYjdiN2Q1ZjNhXkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://stat5.bollywoodhungama.in/wp-content/uploads/2024/04/Pushpa-2-%E2%80%93-The-Rule-1.jpeg"
+    },
+    {
+      "id": "HO00003034",
+      "title": "Singham Again",
+      "rating": "U/A",
+      "durationMinutes": 164,
+      "synopsis": "Bajirao Singham is back in Rohit Shetty's expanded cop universe, joined by India's top officers on a high-stakes cross-border mission.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BMGUyMjc3YTUtMTU4My00MTliLThkM2UtN2FhYjFiNzI0MGFmXkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://static.toiimg.com/photo/114757116.jpeg"
+    },
+    {
+      "id": "HO00003138",
+      "title": "Fateh",
+      "rating": "U/A",
+      "durationMinutes": 20,
+      "synopsis": "A retired special-ops agent leads a solitary life until a young girl falls victim to a ruthless cybercrime syndicate.",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BMWIzMGJkNjItMjQyOC00ZjFhLWExNTktNDFiMjk2NTQ4NDg2XkEyXkFqcGc@._V1_.jpg",
+      "backdropUrl": "https://stat5.bollywoodhungama.in/wp-content/uploads/2025/01/Fateh-16.jpg"
+    }
+  ],
+  "activeShowtimeSessions": [
+    {
+      "sessionId": 27029,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-05T09:30:00.000Z"
+    },
+    {
+      "sessionId": 27025,
+      "filmId": "0020000002",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-05T09:30:00.000Z"
+    },
+    {
+      "sessionId": 27021,
+      "filmId": "0020000004",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-05T09:45:00.000Z"
+    },
+    {
+      "sessionId": 27022,
+      "filmId": "0020000004",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-05T12:00:00.000Z"
+    },
+    {
+      "sessionId": 27030,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-05T12:15:00.000Z"
+    },
+    {
+      "sessionId": 27026,
+      "filmId": "0020000002",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-05T12:30:00.000Z"
+    },
+    {
+      "sessionId": 27023,
+      "filmId": "0020000004",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-05T14:45:00.000Z"
+    },
+    {
+      "sessionId": 27027,
+      "filmId": "0020000002",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-05T15:00:00.000Z"
+    },
+    {
+      "sessionId": 27031,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-05T15:05:00.000Z"
+    },
+    {
+      "sessionId": 27024,
+      "filmId": "0020000004",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-05T17:30:00.000Z"
+    },
+    {
+      "sessionId": 27028,
+      "filmId": "0020000002",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-05T17:35:00.000Z"
+    },
+    {
+      "sessionId": 27032,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-05T17:50:00.000Z"
+    },
+    {
+      "sessionId": 27033,
+      "filmId": "0020000002",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-05T20:05:00.000Z"
+    },
+    {
+      "sessionId": 27035,
+      "filmId": "0020000004",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-05T20:15:00.000Z"
+    },
+    {
+      "sessionId": 27034,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-05T20:35:00.000Z"
+    },
+    {
+      "sessionId": 27036,
+      "filmId": "0020000002",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-06T09:30:00.000Z"
+    },
+    {
+      "sessionId": 27041,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-06T09:30:00.000Z"
+    },
+    {
+      "sessionId": 27046,
+      "filmId": "0020000004",
+      "screenNumber": 3,
+      "originalShowtime": "2021-11-06T09:45:00.000Z"
+    },
+    {
+      "sessionId": 27037,
+      "filmId": "0020000004",
+      "screenNumber": 1,
+      "originalShowtime": "2021-11-06T12:00:00.000Z"
+    },
+    {
+      "sessionId": 27042,
+      "filmId": "0020000003",
+      "screenNumber": 2,
+      "originalShowtime": "2021-11-06T12:15:00.000Z"
+    }
+  ]
+}
