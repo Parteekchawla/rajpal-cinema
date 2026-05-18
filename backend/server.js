@@ -96,7 +96,7 @@ const KNOWN_METADATA = {
     language: 'Punjabi', 
     cast: ['Binnu Dhillon', 'Gurnam Bhullar', 'Jaswinder Bhalla'], 
     director: 'Pankaj Batra',
-    posterUrl: '/images/fuffad_ji_poster.svg', // High-end vector fallback
+    posterUrl: '/images/fuffad_ji_poster.jpg', // Official high-resolution theatrical poster
     backdropUrl: 'https://i.ytimg.com/vi/aZ3CgI1mYmg/maxresdefault.jpg'
   },
   'HO00002714': { 

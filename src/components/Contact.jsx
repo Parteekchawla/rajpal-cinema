@@ -18,7 +18,11 @@ export default function Contact() {
             <div className="contact-icon">📍</div>
             <div>
               <h4>Address</h4>
-              <p>Rajpal Complex, Malout Road<br />Near New Grain Market, S.A.S. Nagar<br />Sri Muktsar Sahib, Punjab – 152026</p>
+              <p>
+                <strong>Rajpal Cinema</strong> (Rajpal Cineplex / SRS Cinemas)<br />
+                Malout Road, S.A.S. Nagar<br />
+                Sri Muktsar Sahib, Punjab – 152026
+              </p>
             </div>
           </div>
           <div className="contact-item">
@@ -46,7 +50,7 @@ export default function Contact() {
 
         <motion.div className="contact-map" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <iframe
-            src="https://maps.google.com/maps?q=Rajpal%20Cinema,%20Muktsar&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            src="https://maps.google.com/maps?q=Rajpal%20Cinema,%20Malout%20Road,%20Sri%20Muktsar%20Sahib&t=&z=16&ie=UTF8&iwloc=&output=embed"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
