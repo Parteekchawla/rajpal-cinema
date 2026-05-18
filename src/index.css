@@ -443,8 +443,39 @@ img { max-width: 100%; display: block; }
   .section { padding:60px 20px; }
   .hero-poster-card { width:240px; }
   .hero-poster-card img { height:360px; }
-  .modal-hero { height:200px; }
-  .modal-hero-overlay { flex-direction:column; align-items:flex-start; }
+  
+  /* Modal Mobile Optimization */
+  .modal-overlay { padding: 10px; }
+  .modal-content { max-height: 95vh; border-radius: 16px; }
+  .modal-hero { height: 220px; }
+  .modal-hero-poster { display: none; } /* Hide small thumbnail to prevent overlapping/clipping */
+  .modal-hero-overlay { padding: 16px; flex-direction: column; align-items: flex-start; }
+  .modal-hero-info h2 { font-size: 1.5rem; }
+  .modal-hero-info .meta { gap: 8px; margin-top: 6px; }
+  .modal-hero-info .meta span { padding: 3px 10px; font-size: 0.75rem; }
+  .modal-body { padding: 20px; }
+
+  /* Mobile Seat Grid Optimization to prevent side clipping */
+  .seat {
+    width: 22px;
+    height: 22px;
+    font-size: 0.55rem;
+    border-radius: 4px;
+  }
+  .seat.aisle {
+    width: 10px;
+  }
+  .seat-row-label {
+    width: 18px;
+    font-size: 0.65rem;
+  }
+  .seat-grid {
+    gap: 4px;
+  }
+  .seat-legend {
+    gap: 12px;
+  }
+  
   .footer-content { grid-template-columns:1fr; }
   .footer-bottom { flex-direction:column; gap:12px; text-align:center; }
   .showtime-item { flex-direction:column; gap:12px; align-items:flex-start; }
