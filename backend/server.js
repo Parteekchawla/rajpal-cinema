@@ -277,6 +277,17 @@ function getDayLabel(date) {
   return date.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+function resolveImageUrl(req, imgPath) {
+  if (!imgPath) return '';
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+    return imgPath;
+  }
+  // Prepend the backend host dynamically!
+  const host = req.get('host') || 'localhost:5000';
+  const protocol = req.protocol || 'http';
+  return `${protocol}://${host}${imgPath}`;
+}
+
 // deterministic hash for consistent seat maps
 function hashCode(str) {
   let hash = 0;
@@ -332,6 +343,9 @@ app.get('/api/films', async (req, res) => {
         director: 'Unknown',
       };
 
+      const rawPoster = meta.posterUrl || row.Film_strURL3?.trim();
+      const rawBackdrop = meta.backdropUrl || row.Film_strURL4?.trim();
+
       return {
         id: code,
         title: meta.title || row.Film_strTitle.trim(),
@@ -340,8 +354,8 @@ app.get('/api/films', async (req, res) => {
         duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
         rating: row.Film_strCensor.trim() || 'UA',
         language: meta.language,
-        posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
-        backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
+        posterUrl: resolveImageUrl(req, rawPoster),
+        backdropUrl: resolveImageUrl(req, rawBackdrop),
         cast: meta.cast,
         director: meta.director,
         isNowShowing: true,
@@ -399,6 +413,9 @@ app.get('/api/coming-soon', async (req, res) => {
       releaseDate.setDate(releaseDate.getDate() + 30);
       const comingSoonLabel = releaseDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
 
+      const rawPoster = meta.posterUrl || row.Film_strURL3?.trim();
+      const rawBackdrop = meta.backdropUrl || row.Film_strURL4?.trim();
+
       return {
         id: code,
         title: meta.title || row.Film_strTitle.trim(),
@@ -407,8 +424,8 @@ app.get('/api/coming-soon', async (req, res) => {
         duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
         rating: row.Film_strCensor.trim() || 'UA',
         language: meta.language,
-        posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
-        backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
+        posterUrl: resolveImageUrl(req, rawPoster),
+        backdropUrl: resolveImageUrl(req, rawBackdrop),
         cast: meta.cast,
         director: meta.director,
         isNowShowing: false,
@@ -471,6 +488,9 @@ app.get('/api/films/:filmId', async (req, res) => {
 
     const isComingSoon = ['HO00002714', 'HO00002829', 'HO00003034', 'HO00003138'].includes(code);
 
+    const rawPoster = meta.posterUrl || row.Film_strURL3?.trim();
+    const rawBackdrop = meta.backdropUrl || row.Film_strURL4?.trim();
+
     res.json({
       id: code,
       title: meta.title || row.Film_strTitle.trim(),
@@ -479,8 +499,8 @@ app.get('/api/films/:filmId', async (req, res) => {
       duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
       rating: row.Film_strCensor.trim() || 'UA',
       language: meta.language,
-      posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
-      backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
+      posterUrl: resolveImageUrl(req, rawPoster),
+      backdropUrl: resolveImageUrl(req, rawBackdrop),
       cast: meta.cast,
       director: meta.director,
       isNowShowing: !isComingSoon
