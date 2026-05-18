@@ -4,6 +4,7 @@ import alasql from 'alasql';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import mssql from 'mssql/msnodesqlv8.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,27 +19,126 @@ app.use(express.json());
 // Serving images locally
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
-// ─── INITIALIZE ALASQL DATABASE ─────────────────────────────────────────────
+// ─── SQL SERVER EXPRESS CONNECTION ───────────────────────────────────────────
+const sqlConfig = {
+  server: 'localhost',
+  driver: 'msnodesqlv8',
+  connectionString: 'Driver={ODBC Driver 17 for SQL Server};Server=(local)\\SQLEXPRESS;Database=RajpalVista;Trusted_Connection=yes;',
+  options: {
+    trustServerCertificate: true,
+  }
+};
+
+let pool;
+let isSqlServerConnected = false;
+
+async function getDbConnection() {
+  if (pool && isSqlServerConnected) return pool;
+  try {
+    pool = await mssql.connect(sqlConfig);
+    isSqlServerConnected = true;
+    console.log('[DATABASE SUCCESS] Successfully connected to live local SQL Server Express database (RajpalVista).');
+    return pool;
+  } catch (err) {
+    console.warn('[DATABASE WARNING] SQL Server Express connection failed. Falling back to in-memory Alasql database.', err.message);
+    isSqlServerConnected = false;
+    throw err;
+  }
+}
+
+// Initial connection attempt on startup
+getDbConnection().catch(() => {});
+
+// ─── INITIALIZE ALASQL FALLBACK DATABASE ─────────────────────────────────────
 console.log('Initializing self-contained pure JavaScript SQL database (Alasql)...');
 
-// Create authentic Vista tables
 alasql('CREATE TABLE tblFilm (Film_strCode STRING, Film_strTitle STRING, Film_strCensor STRING, Film_intDuration INT, Film_strDescription STRING, Film_strURL3 STRING, Film_strURL4 STRING)');
 alasql('CREATE TABLE tblSession (Session_strCode STRING, Film_strCode STRING, Session_dtmShowing STRING, Screen_intNumber INT)');
 
-// Populate authentic films from SQL Server backup
-// Dynamic database import from SQL Server export
 let filmRecords = [];
 let sessionRecords = [];
 
 const KNOWN_METADATA = {
-  '0020000002': { genre: 'Drama / Comedy / Musical', language: 'Punjabi', cast: ['Gippy Grewal', 'Neeru Bajwa', 'Karamjit Anmol', 'Gurpreet Ghuggi'], director: 'Vijay Kumar Arora' },
-  '0020000003': { genre: 'Action / Crime / Thriller', language: 'Hindi', cast: ['Akshay Kumar', 'Katrina Kaif', 'Ajay Devgn', 'Ranveer Singh'], director: 'Rohit Shetty' },
-  '0020000004': { genre: 'Comedy / Drama / Romance', language: 'Punjabi', cast: ['Diljit Dosanjh', 'Shehnaaz Gill', 'Sonam Bajwa', 'Shinda Grewal'], director: 'Amarjit Singh Saron' },
-  '0020000005': { genre: 'Comedy / Family / Drama', language: 'Punjabi', cast: ['Binnu Dhillon', 'Gurnam Bhullar', 'Jaswinder Bhalla'], director: 'Pankaj Batra' },
-  'HO00002714': { genre: 'Biography / Drama / Sport', language: 'Hindi', cast: ['Aamir Khan', 'Sakshi Tanwar', 'Fatima Sana Shaikh'], director: 'Nitesh Tiwari' },
-  'HO00003138': { genre: 'Comedy / Drama', language: 'Punjabi', cast: ['Gippy Grewal', 'Sonam Bajwa', 'Gurpreet Ghuggi'], director: 'Smeep Kang' },
-  'HO00002829': { genre: 'Action / Widescreen / Fantasy', language: 'Hindi / Telugu', cast: ['Prabhas', 'Rana Daggubati', 'Anushka Shetty'], director: 'S. S. Rajamouli' },
-  'HO00003034': { genre: 'Action / Adventure / Thriller', language: 'Hindi', cast: ['Salman Khan', 'Katrina Kaif', 'Sajjad Delafrooz'], director: 'Ali Abbas Zafar' }
+  '0020000002': { 
+    title: 'Pani Ch Madhaani',
+    synopsis: 'Set in the 1980s, a struggling group of Punjabi musicians search for fame, love, and their big breakthrough in the UK, leading to a series of unexpected events.',
+    genre: 'Drama / Comedy / Musical', 
+    language: 'Punjabi', 
+    cast: ['Gippy Grewal', 'Neeru Bajwa', 'Karamjit Anmol', 'Gurpreet Ghuggi'], 
+    director: 'Vijay Kumar Arora',
+    posterUrl: '/images/pani_ch_madhaani_poster.jpg',
+    backdropUrl: 'https://i.ytimg.com/vi/GzI87o-Lslc/maxresdefault.jpg'
+  },
+  '0020000003': { 
+    title: 'Sooryavanshi',
+    synopsis: 'A daredevil Mumbai cop joins forces with two legendary officers to stop a major terror plot threatening the city, packing high-octane stunts and blockbuster entertainment.',
+    genre: 'Action / Crime / Thriller', 
+    language: 'Hindi', 
+    cast: ['Akshay Kumar', 'Katrina Kaif', 'Ajay Devgn', 'Ranveer Singh'], 
+    director: 'Rohit Shetty',
+    posterUrl: '/images/sooryavanshi_poster.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg'
+  },
+  '0020000004': { 
+    title: 'Honsla Rakh',
+    synopsis: 'A single father navigates the struggles of parenting and dating in modern Vancouver, only for his ex-wife to suddenly reappear in his life causing a hilarious love-triangle.',
+    genre: 'Comedy / Drama / Romance', 
+    language: 'Punjabi', 
+    cast: ['Diljit Dosanjh', 'Shehnaaz Gill', 'Sonam Bajwa', 'Shinda Grewal'], 
+    director: 'Amarjit Singh Saron',
+    posterUrl: '/images/honsla_rakh_poster.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/mN71w2Cq80dZkYjY6H3yC76GgWb.jpg'
+  },
+  '0020000005': { 
+    title: 'Fuffad Ji',
+    synopsis: 'A satirical comedy about family rivalry, ego, and local politics in a traditional Punjabi household as a newlywed son-in-law challenges his senior brother-in-law.',
+    genre: 'Comedy / Family / Drama', 
+    language: 'Punjabi', 
+    cast: ['Binnu Dhillon', 'Gurnam Bhullar', 'Jaswinder Bhalla'], 
+    director: 'Pankaj Batra',
+    posterUrl: '/images/fuffad_ji_poster.svg', // High-end vector fallback
+    backdropUrl: 'https://i.ytimg.com/vi/aZ3CgI1mYmg/maxresdefault.jpg'
+  },
+  'HO00002714': { 
+    title: 'Dangal',
+    synopsis: "A former wrestler trains his daughters to become world-class champions against all social odds, leading them to India's first-ever gold medal in wrestling.",
+    genre: 'Biography / Drama / Sport', 
+    language: 'Hindi', 
+    cast: ['Aamir Khan', 'Sakshi Tanwar', 'Fatima Sana Shaikh'], 
+    director: 'Nitesh Tiwari',
+    posterUrl: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg',
+    backdropUrl: 'https://i.ytimg.com/vi/x_7YlGv9u1g/maxresdefault.jpg'
+  },
+  'HO00003138': { 
+    title: 'Carry On Jatta 2',
+    synopsis: 'A hilarious comedy of errors as a young orphan tries to win the heart of a girl who only wants to marry a man with a large family, resulting in chaos and confusion.',
+    genre: 'Comedy / Drama', 
+    language: 'Punjabi', 
+    cast: ['Gippy Grewal', 'Sonam Bajwa', 'Gurpreet Ghuggi'], 
+    director: 'Smeep Kang',
+    posterUrl: '/images/carry_on_jatta_2_poster.jpg',
+    backdropUrl: 'https://i.ytimg.com/vi/F-tC40rA8h4/maxresdefault.jpg'
+  },
+  'HO00002829': { 
+    title: 'Baahubali 2: The Conclusion',
+    synopsis: "The epic conclusion to the saga of Mahendra Baahubali and his quest to reclaim the throne of Mahishmati while uncovering the dark secrets of his legendary father's murder.",
+    genre: 'Action / Widescreen / Fantasy', 
+    language: 'Hindi / Telugu', 
+    cast: ['Prabhas', 'Rana Daggubati', 'Anushka Shetty'], 
+    director: 'S. S. Rajamouli',
+    posterUrl: '/images/baahubali_2_poster.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/2w8gD8M4w4wX3v0S9yX6w2B8w.jpg'
+  },
+  'HO00003034': { 
+    title: 'Tiger Zinda Hai',
+    synopsis: 'A massive action espionage thriller following super spies Tiger and Zoya as they team up to rescue a group of Indian and Pakistani nurses held hostage in Iraq.',
+    genre: 'Action / Adventure / Thriller', 
+    language: 'Hindi', 
+    cast: ['Salman Khan', 'Katrina Kaif', 'Sajjad Delafrooz'], 
+    director: 'Ali Abbas Zafar',
+    posterUrl: '/images/tiger_zinda_hai_poster.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/6t3T1e82E8m92S8e2T0w2E6mE8g.jpg'
+  }
 };
 
 const FILM_METADATA = {};
@@ -46,11 +146,10 @@ const FILM_METADATA = {};
 try {
   const exportPath = path.join(__dirname, 'rajpal_database_export.json');
   if (fs.existsSync(exportPath)) {
-    console.log('[DATABASE] Loading database records from rajpal_database_export.json...');
+    console.log('[DATABASE] Loading backup database records from rajpal_database_export.json...');
     const rawData = fs.readFileSync(exportPath, 'utf8');
     const dbData = JSON.parse(rawData);
 
-    // Map Now Showing films from database export
     if (dbData.nowShowingFilms) {
       dbData.nowShowingFilms.forEach(f => {
         filmRecords.push({
@@ -65,7 +164,6 @@ try {
       });
     }
 
-    // Map Coming Soon films from database export
     if (dbData.comingSoonFilms) {
       dbData.comingSoonFilms.forEach(f => {
         filmRecords.push({
@@ -80,7 +178,6 @@ try {
       });
     }
 
-    // Map sessions from database export
     if (dbData.activeShowtimeSessions) {
       dbData.activeShowtimeSessions.forEach(s => {
         const cleanTime = s.originalShowtime ? s.originalShowtime.replace(/\.\d+Z$/, '').replace('Z', '') : '';
@@ -99,140 +196,39 @@ try {
   console.error('[DATABASE ERROR] Failed to load data from database export:', e);
 }
 
-// Fallback static records in case the database export is missing or corrupt
+// Fallback static records in case the export file is missing
 if (filmRecords.length === 0) {
-  console.log('[DATABASE WARNING] Database export not found. Loading fallback records...');
-  filmRecords = [
-    {
-      Film_strCode: '0020000002',
-      Film_strTitle: 'Pani Ch Madhaani',
-      Film_strCensor: 'A',
-      Film_intDuration: 140,
-      Film_strDescription: 'Set in the 1980s, a struggling group of Punjabi musicians search for fame, love, and their big breakthrough in the UK, leading to a series of unexpected events.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMDFkNGMwNjEtOGMzYi00MTc0LThkNDItZmNmZmY2MzE4MjQ4XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://i.ytimg.com/vi/GzI87o-Lslc/maxresdefault.jpg'
-    },
-    {
-      Film_strCode: '0020000003',
-      Film_strTitle: 'Sooryavanshi',
+  filmRecords = Object.keys(KNOWN_METADATA).map(code => {
+    const meta = KNOWN_METADATA[code];
+    return {
+      Film_strCode: code,
+      Film_strTitle: meta.title,
       Film_strCensor: 'U/A',
-      Film_intDuration: 158,
-      Film_strDescription: 'A daredevil Mumbai cop joins forces with two legendary officers to stop a major terror plot threatening the city, packing high-octane stunts and blockbuster entertainment.',
-      Film_strURL3: 'https://image.tmdb.org/t/p/w500/8425gJv18V86n2tYQ5o0h745y8S.jpg',
-      Film_strURL4: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg'
-    },
-    {
-      Film_strCode: '0020000004',
-      Film_strTitle: 'Honsla Rakh',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 158,
-      Film_strDescription: 'A single father navigates the struggles of parenting and dating in modern Vancouver, only for his ex-wife to suddenly reappear in his life causing a hilarious love-triangle.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BYzg0YmRlZTUtYzVkYS00OTlhLTlhOWUtNDQ3MDAxY2EwYmU0XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://image.tmdb.org/t/p/original/mN71w2Cq80dZkYjY6H3yC76GgWb.jpg'
-    },
-    {
-      Film_strCode: '0020000005',
-      Film_strTitle: 'Fuffad Ji',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 114,
-      Film_strDescription: 'A satirical comedy about family rivalry, ego, and local politics in a traditional Punjabi household as a newlywed son-in-law challenges his senior brother-in-law.',
-      Film_strURL3: 'https://m.media-amazon.com/images/M/MV5BMjA5OTdiYzAtNjliMy00NjcyLTlhMDYtZjhmMWZmNjg5NmY1XkEyXkFqcGc@._V1_.jpg',
-      Film_strURL4: 'https://i.ytimg.com/vi/aZ3CgI1mYmg/maxresdefault.jpg'
-    },
-    {
-      Film_strCode: 'HO00002714',
-      Film_strTitle: 'Dangal',
-      Film_strCensor: 'U',
-      Film_intDuration: 161,
-      Film_strDescription: 'A former wrestler trains his daughters to become world-class champions against all social odds, leading them to India\'s first-ever gold medal in wrestling.',
-      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg',
-      Film_strURL4: 'https://i.ytimg.com/vi/x_7YlGv9u1g/maxresdefault.jpg'
-    },
-    {
-      Film_strCode: 'HO00003138',
-      Film_strTitle: 'Carry On Jatta 2',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 135,
-      Film_strDescription: 'A hilarious comedy of errors as a young orphan tries to win the heart of a girl who only wants to marry a man with a large family, resulting in chaos and confusion.',
-      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Carry_On_Jatta_2.jpg',
-      Film_strURL4: 'https://i.ytimg.com/vi/F-tC40rA8h4/maxresdefault.jpg'
-    },
-    {
-      Film_strCode: 'HO00002829',
-      Film_strTitle: 'Baahubali 2: The Conclusion',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 167,
-      Film_strDescription: 'The epic conclusion to the saga of Mahendra Baahubali and his quest to reclaim the throne of Mahishmati while uncovering the dark secrets of his legendary father\'s murder.',
-      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Baahubali_2_The_Conclusion_poster.jpg',
-      Film_strURL4: 'https://image.tmdb.org/t/p/original/2w8gD8M4w4wX3v0S9yX6w2B8w.jpg'
-    },
-    {
-      Film_strCode: 'HO00003034',
-      Film_strTitle: 'Tiger Zinda Hai',
-      Film_strCensor: 'U/A',
-      Film_intDuration: 161,
-      Film_strDescription: 'A massive action espionage thriller following super spies Tiger and Zoya as they team up to rescue a group of Indian and Pakistani nurses held hostage in Iraq.',
-      Film_strURL3: 'https://upload.wikimedia.org/wikipedia/en/2/23/Tiger_Zinda_Hai_poster.jpg',
-      Film_strURL4: 'https://image.tmdb.org/t/p/original/6t3T1e82E8m92S8e2T0w2E6mE8g.jpg'
-    }
-  ];
-
-  sessionRecords = [
-    { Session_strCode: 's1_1', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T10:30:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_2', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T13:45:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_3', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T17:00:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_4', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-05T20:15:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_5', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T10:30:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_6', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T13:45:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_7', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T17:00:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_8', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-06T20:15:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_9', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T13:45:00', Screen_intNumber: 1 },
-    { Session_strCode: 's1_10', Film_strCode: '0020000003', Session_dtmShowing: '2021-11-07T20:15:00', Screen_intNumber: 1 },
-    { Session_strCode: 's2_1', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T11:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_2', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T14:15:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_3', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T17:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_4', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-05T20:45:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_5', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T11:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_6', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T14:15:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_7', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T17:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 's2_8', Film_strCode: '0020000004', Session_dtmShowing: '2021-11-06T20:45:00', Screen_intNumber: 2 },
-    { Session_strCode: 's3_1', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T12:00:00', Screen_intNumber: 1 },
-    { Session_strCode: 's3_2', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-05T15:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 's3_3', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T12:00:00', Screen_intNumber: 1 },
-    { Session_strCode: 's3_4', Film_strCode: '0020000005', Session_dtmShowing: '2021-11-06T15:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 's4_1', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T10:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 's4_2', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-05T16:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 's4_3', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T10:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 's4_4', Film_strCode: '0020000002', Session_dtmShowing: '2021-11-06T16:00:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_1_1', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T11:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_1_2', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-05T15:45:00', Screen_intNumber: 1 },
-    { Session_strCode: 'sc_1_3', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T11:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_1_4', Film_strCode: 'HO00003138', Session_dtmShowing: '2021-11-06T18:15:00', Screen_intNumber: 1 },
-    { Session_strCode: 'sc_2_1', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-05T12:30:00', Screen_intNumber: 1 },
-    { Session_strCode: 'sc_2_2', Film_strCode: 'HO00002714', Session_dtmShowing: '2021-11-06T15:45:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_3_1', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-05T14:00:00', Screen_intNumber: 1 },
-    { Session_strCode: 'sc_3_2', Film_strCode: 'HO00002829', Session_dtmShowing: '2021-11-06T20:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_4_1', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-05T16:30:00', Screen_intNumber: 2 },
-    { Session_strCode: 'sc_4_2', Film_strCode: 'HO00003034', Session_dtmShowing: '2021-11-06T19:45:00', Screen_intNumber: 1 }
-  ];
+      Film_intDuration: 130,
+      Film_strDescription: meta.synopsis,
+      Film_strURL3: meta.posterUrl,
+      Film_strURL4: meta.backdropUrl
+    };
+  });
 }
 
-// Populate Alasql tables
+// Populate Alasql fallback tables
 alasql('INSERT INTO tblFilm SELECT * FROM ?', [filmRecords]);
 alasql('INSERT INTO tblSession SELECT * FROM ?', [sessionRecords]);
 
-// Dynamically generate film metadata mapping for all loaded films
-filmRecords.forEach(f => {
-  const known = KNOWN_METADATA[f.Film_strCode] || { genre: 'Action / Drama', language: 'Hindi', cast: [], director: 'Unknown' };
-  FILM_METADATA[f.Film_strCode] = {
-    title: f.Film_strTitle,
-    synopsis: f.Film_strDescription,
-    posterUrl: f.Film_strURL3,
-    backdropUrl: f.Film_strURL4,
-    genre: known.genre,
-    language: known.language,
-    cast: known.cast,
-    director: known.director
+// Dynamically generate film metadata mapping
+Object.keys(KNOWN_METADATA).forEach(code => {
+  const f = filmRecords.find(item => item.Film_strCode === code) || {};
+  const known = KNOWN_METADATA[code];
+  FILM_METADATA[code] = {
+    title: known.title || f.Film_strTitle,
+    synopsis: known.synopsis || f.Film_strDescription,
+    posterUrl: known.posterUrl || f.Film_strURL3,
+    backdropUrl: known.backdropUrl || f.Film_strURL4,
+    genre: known.genre || 'Action / Drama',
+    language: known.language || 'Punjabi',
+    cast: known.cast || [],
+    director: known.director || 'Unknown'
   };
 });
 
@@ -242,9 +238,13 @@ console.log('[SUCCESS] Database tables and movie metadata loaded successfully!')
 const bookings = [];
 
 // Helper function to shift Vista dates from Nov 2021 to "This Week" (Today + offset)
+// This fully prevents negative time values or NaN calculations!
 function shiftDate(originalDateStr) {
+  if (!originalDateStr) return new Date();
   const originalDate = new Date(originalDateStr);
-  const baseDate = new Date('2021-11-05T00:00:00'); // Base Friday
+  if (isNaN(originalDate.getTime())) return new Date();
+
+  const baseDate = new Date('2021-11-05T00:00:00'); // Base Friday of Vista backup
   
   const diffTime = originalDate.getTime() - baseDate.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -252,7 +252,10 @@ function shiftDate(originalDateStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const shifted = new Date(today.getTime() + (diffDays % 7) * 24 * 60 * 60 * 1000);
+  let dayOffset = diffDays % 7;
+  if (dayOffset < 0) dayOffset += 7; // Force positive modulo
+  
+  const shifted = new Date(today.getTime() + dayOffset * 24 * 60 * 60 * 1000);
   shifted.setHours(originalDate.getHours(), originalDate.getMinutes(), originalDate.getSeconds(), 0);
   
   return shifted;
@@ -287,20 +290,42 @@ function hashCode(str) {
 // ─── ROUTES ─────────────────────────────────────────────────────────────────
 
 // GET /api/films
-app.get('/api/films', (req, res) => {
+app.get('/api/films', async (req, res) => {
   try {
-    const result = alasql(`
-      SELECT DISTINCT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
-      FROM tblFilm f
-      JOIN tblSession s ON f.Film_strCode = s.Film_strCode
-      WHERE s.Session_dtmShowing >= '2021-11-01' AND f.Film_strTitle IS NOT NULL
-    `);
+    let rows = [];
+    if (isSqlServerConnected) {
+      try {
+        const db = await getDbConnection();
+        const result = await db.query(`
+          SELECT DISTINCT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+          FROM tblFilm f
+          JOIN tblSession s ON f.Film_strCode = s.Film_strCode
+          WHERE s.Session_dtmShowing >= '2021-11-01' AND f.Film_strTitle IS NOT NULL
+        `);
+        rows = result.recordset;
+      } catch (dbErr) {
+        console.error('[SQL Server Error] Falling back to Alasql for /api/films:', dbErr.message);
+        rows = alasql(`
+          SELECT DISTINCT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+          FROM tblFilm f
+          JOIN tblSession s ON f.Film_strCode = s.Film_strCode
+          WHERE s.Session_dtmShowing >= '2021-11-01' AND f.Film_strTitle IS NOT NULL
+        `);
+      }
+    } else {
+      rows = alasql(`
+        SELECT DISTINCT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+        FROM tblFilm f
+        JOIN tblSession s ON f.Film_strCode = s.Film_strCode
+        WHERE s.Session_dtmShowing >= '2021-11-01' AND f.Film_strTitle IS NOT NULL
+      `);
+    }
 
-    const films = result.map(row => {
+    const films = rows.map(row => {
       const code = row.Film_strCode.trim();
       const meta = FILM_METADATA[code] || {
-        posterUrl: '/images/sooryavanshi_poster.svg',
-        backdropUrl: '/images/sooryavanshi_backdrop.svg',
+        posterUrl: '/images/sooryavanshi_poster.jpg',
+        backdropUrl: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg',
         genre: 'Drama / Action',
         language: 'Hindi',
         cast: [],
@@ -315,8 +340,8 @@ app.get('/api/films', (req, res) => {
         duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
         rating: row.Film_strCensor.trim() || 'UA',
         language: meta.language,
-        posterUrl: row.Film_strURL3?.trim() || meta.posterUrl,
-        backdropUrl: row.Film_strURL4?.trim() || meta.backdropUrl,
+        posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
+        backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
         cast: meta.cast,
         director: meta.director,
         isNowShowing: true,
@@ -331,19 +356,39 @@ app.get('/api/films', (req, res) => {
 });
 
 // GET /api/coming-soon
-app.get('/api/coming-soon', (req, res) => {
+app.get('/api/coming-soon', async (req, res) => {
   try {
-    const result = alasql(`
-      SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
-      FROM tblFilm f
-      WHERE f.Film_strCode IN ('HO00002714', 'HO00002829', 'HO00003034', 'HO00003138')
-    `);
+    let rows = [];
+    if (isSqlServerConnected) {
+      try {
+        const db = await getDbConnection();
+        const result = await db.query(`
+          SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+          FROM tblFilm f
+          WHERE f.Film_strCode IN ('HO00002714', 'HO00002829', 'HO00003034', 'HO00003138')
+        `);
+        rows = result.recordset;
+      } catch (dbErr) {
+        console.error('[SQL Server Error] Falling back to Alasql for /api/coming-soon:', dbErr.message);
+        rows = alasql(`
+          SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+          FROM tblFilm f
+          WHERE f.Film_strCode IN ('HO00002714', 'HO00002829', 'HO00003034', 'HO00003138')
+        `);
+      }
+    } else {
+      rows = alasql(`
+        SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+        FROM tblFilm f
+        WHERE f.Film_strCode IN ('HO00002714', 'HO00002829', 'HO00003034', 'HO00003138')
+      `);
+    }
 
-    const films = result.map(row => {
+    const films = rows.map(row => {
       const code = row.Film_strCode.trim();
       const meta = FILM_METADATA[code] || {
-        posterUrl: '/images/sooryavanshi_poster.svg',
-        backdropUrl: '/images/sooryavanshi_backdrop.svg',
+        posterUrl: '/images/sooryavanshi_poster.jpg',
+        backdropUrl: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg',
         genre: 'Drama / Action',
         language: 'Hindi',
         cast: [],
@@ -362,8 +407,8 @@ app.get('/api/coming-soon', (req, res) => {
         duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
         rating: row.Film_strCensor.trim() || 'UA',
         language: meta.language,
-        posterUrl: row.Film_strURL3?.trim() || meta.posterUrl,
-        backdropUrl: row.Film_strURL4?.trim() || meta.backdropUrl,
+        posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
+        backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
         cast: meta.cast,
         director: meta.director,
         isNowShowing: false,
@@ -379,14 +424,36 @@ app.get('/api/coming-soon', (req, res) => {
 });
 
 // GET /api/films/:filmId
-app.get('/api/films/:filmId', (req, res) => {
+app.get('/api/films/:filmId', async (req, res) => {
   const { filmId } = req.params;
   try {
-    const row = alasql(`
-      SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
-      FROM tblFilm f
-      WHERE f.Film_strCode = ?
-    `, [filmId])[0];
+    let row;
+    if (isSqlServerConnected) {
+      try {
+        const db = await getDbConnection();
+        const result = await db.request()
+          .input('filmId', mssql.VarChar, filmId)
+          .query(`
+            SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+            FROM tblFilm f
+            WHERE f.Film_strCode = @filmId
+          `);
+        row = result.recordset[0];
+      } catch (dbErr) {
+        console.error('[SQL Server Error] Falling back to Alasql for /api/films/:filmId:', dbErr.message);
+        row = alasql(`
+          SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+          FROM tblFilm f
+          WHERE f.Film_strCode = ?
+        `, [filmId])[0];
+      }
+    } else {
+      row = alasql(`
+        SELECT f.Film_strCode, f.Film_strTitle, f.Film_strCensor, f.Film_intDuration, f.Film_strDescription, f.Film_strURL3, f.Film_strURL4
+        FROM tblFilm f
+        WHERE f.Film_strCode = ?
+      `, [filmId])[0];
+    }
 
     if (!row) {
       return res.status(404).json({ error: 'Film not found' });
@@ -394,8 +461,8 @@ app.get('/api/films/:filmId', (req, res) => {
 
     const code = row.Film_strCode.trim();
     const meta = FILM_METADATA[code] || {
-      posterUrl: '/images/sooryavanshi_poster.svg',
-      backdropUrl: '/images/sooryavanshi_backdrop.svg',
+      posterUrl: '/images/sooryavanshi_poster.jpg',
+      backdropUrl: 'https://image.tmdb.org/t/p/original/fX2yq57gHjYd1sC21Z9w8c3aQG8.jpg',
       genre: 'Drama / Action',
       language: 'Hindi',
       cast: [],
@@ -412,8 +479,8 @@ app.get('/api/films/:filmId', (req, res) => {
       duration: `${Math.floor(row.Film_intDuration / 60)}h ${row.Film_intDuration % 60}min`,
       rating: row.Film_strCensor.trim() || 'UA',
       language: meta.language,
-      posterUrl: row.Film_strURL3?.trim() || meta.posterUrl,
-      backdropUrl: row.Film_strURL4?.trim() || meta.backdropUrl,
+      posterUrl: meta.posterUrl || row.Film_strURL3?.trim(),
+      backdropUrl: meta.backdropUrl || row.Film_strURL4?.trim(),
       cast: meta.cast,
       director: meta.director,
       isNowShowing: !isComingSoon
@@ -425,18 +492,46 @@ app.get('/api/films/:filmId', (req, res) => {
 });
 
 // GET /api/films/:filmId/showtimes
-app.get('/api/films/:filmId/showtimes', (req, res) => {
+app.get('/api/films/:filmId/showtimes', async (req, res) => {
   const { filmId } = req.params;
   try {
-    const result = alasql(`
-      SELECT s.Session_strCode, s.Session_dtmShowing, s.Screen_intNumber
-      FROM tblSession s
-      WHERE s.Film_strCode = ? AND s.Session_dtmShowing >= '2021-11-01'
-      ORDER BY s.Session_dtmShowing ASC
-    `, [filmId]);
+    let rows = [];
+    if (isSqlServerConnected) {
+      try {
+        const db = await getDbConnection();
+        const result = await db.request()
+          .input('filmId', mssql.VarChar, filmId)
+          .query(`
+            SELECT s.Session_lngSessionId, s.Screen_bytNum, s.Session_dtmShowing
+            FROM tblSession s
+            WHERE s.Film_strCode = @filmId AND s.Session_dtmShowing >= '2021-11-01'
+            ORDER BY s.Session_dtmShowing ASC
+          `);
+        rows = result.recordset.map(r => ({
+          Session_strCode: `st-${r.Session_lngSessionId}`,
+          Session_dtmShowing: r.Session_dtmShowing.toISOString(),
+          Screen_intNumber: r.Screen_bytNum
+        }));
+      } catch (dbErr) {
+        console.error('[SQL Server Error] Falling back to Alasql for /api/films/:filmId/showtimes:', dbErr.message);
+        rows = alasql(`
+          SELECT s.Session_strCode, s.Session_dtmShowing, s.Screen_intNumber
+          FROM tblSession s
+          WHERE s.Film_strCode = ? AND s.Session_dtmShowing >= '2021-11-01'
+          ORDER BY s.Session_dtmShowing ASC
+        `, [filmId]);
+      }
+    } else {
+      rows = alasql(`
+        SELECT s.Session_strCode, s.Session_dtmShowing, s.Screen_intNumber
+        FROM tblSession s
+        WHERE s.Film_strCode = ? AND s.Session_dtmShowing >= '2021-11-01'
+        ORDER BY s.Session_dtmShowing ASC
+      `, [filmId]);
+    }
 
     const grouped = {};
-    result.forEach(row => {
+    rows.forEach(row => {
       const originalTime = row.Session_dtmShowing;
       const shifted = shiftDate(originalTime);
       const dayLabel = getDayLabel(shifted);
@@ -469,19 +564,44 @@ app.get('/api/films/:filmId/showtimes', (req, res) => {
 });
 
 // GET /api/seat-layouts/:showtimeId
-app.get('/api/seat-layouts/:showtimeId', (req, res) => {
+app.get('/api/seat-layouts/:showtimeId', async (req, res) => {
   const { showtimeId } = req.params;
   try {
     const seed = hashCode(showtimeId);
     const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     const seatsPerRow = 12;
 
+    // Fetch booked seats from local SQL Server tblBooking_Detail table
+    const dbBookedSeats = new Set();
+    if (isSqlServerConnected && showtimeId.startsWith('st-')) {
+      try {
+        const sessionId = parseInt(showtimeId.replace('st-', ''));
+        const db = await getDbConnection();
+        const result = await db.request()
+          .input('sessionId', mssql.Int, sessionId)
+          .query(`
+            SELECT ScreenD_strPhyRowId, ScreenD_strSeatId 
+            FROM tblBooking_Detail 
+            WHERE Session_lngSessionId = @sessionId AND BookingD_strStatus = 'P'
+          `);
+        result.recordset.forEach(row => {
+          const rowChar = row.ScreenD_strPhyRowId.trim();
+          const seatNum = row.ScreenD_strSeatId.trim();
+          dbBookedSeats.add(`${rowChar}${seatNum}`);
+        });
+      } catch (dbErr) {
+        console.error('[SQL Server Seat Fetch Error] Failed to fetch booked seats, using local memory only:', dbErr.message);
+      }
+    }
+
     const layoutRows = rows.map((rowChar, rowIndex) => {
       const seats = [];
       for (let sNum = 1; sNum <= seatsPerRow; sNum++) {
-        const hash = Math.abs(hashCode(`${showtimeId}-${rowChar}-${sNum}`));
-        const isReservedInDB = bookings.some(b => b.showtimeId === showtimeId && b.seats.includes(`${rowChar}${sNum}`));
-        const isBooked = isReservedInDB; // Booked status comes ONLY from database bookings!
+        // Booked status checks in-memory checkout bookings and live database bookings
+        const isReservedInMem = bookings.some(b => b.showtimeId === showtimeId && b.seats.includes(`${rowChar}${sNum}`));
+        const isReservedInDB = dbBookedSeats.has(`${rowChar}${sNum}`);
+        
+        const isBooked = isReservedInMem || isReservedInDB;
 
         seats.push({
           id: `${rowChar}${sNum}`,
@@ -510,7 +630,7 @@ app.get('/api/seat-layouts/:showtimeId', (req, res) => {
 });
 
 // POST /api/orders
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const { showtimeId, filmId, seats, phone, ticketType } = req.body;
   const name = req.body.name || 'Guest User';
   const email = req.body.email || 'guest@rajpalcinema.com';
@@ -520,11 +640,32 @@ app.post('/api/orders', (req, res) => {
   }
 
   try {
-    const filmRow = alasql(`
-      SELECT f.Film_strTitle FROM tblFilm f WHERE f.Film_strCode = ?
-    `, [filmId])[0];
+    let filmTitle = 'Unknown Movie';
+    
+    // Fetch movie title
+    if (isSqlServerConnected) {
+      try {
+        const db = await getDbConnection();
+        const filmRow = await db.request()
+          .input('filmId', mssql.VarChar, filmId)
+          .query('SELECT Film_strTitle FROM tblFilm WHERE Film_strCode = @filmId');
+        if (filmRow.recordset[0]) {
+          filmTitle = filmRow.recordset[0].Film_strTitle.trim();
+        }
+      } catch (dbErr) {
+        console.error('[SQL Server Title Error] Falling back to Alasql for movie title:', dbErr.message);
+        const filmRow = alasql(`
+          SELECT f.Film_strTitle FROM tblFilm f WHERE f.Film_strCode = ?
+        `, [filmId])[0];
+        filmTitle = filmRow ? filmRow.Film_strTitle.trim() : 'Unknown Movie';
+      }
+    } else {
+      const filmRow = alasql(`
+        SELECT f.Film_strTitle FROM tblFilm f WHERE f.Film_strCode = ?
+      `, [filmId])[0];
+      filmTitle = filmRow ? filmRow.Film_strTitle.trim() : 'Unknown Movie';
+    }
 
-    const filmTitle = filmRow ? filmRow.Film_strTitle.trim() : 'Unknown Movie';
     const bookingId = `BK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const newBooking = {
@@ -540,6 +681,36 @@ app.post('/api/orders', (req, res) => {
     };
 
     bookings.push(newBooking);
+
+    // Save bookings directly into live SQL Server table tblBooking_Detail
+    if (isSqlServerConnected && showtimeId.startsWith('st-')) {
+      try {
+        const sessionId = parseInt(showtimeId.replace('st-', ''));
+        const db = await getDbConnection();
+        
+        for (const seat of seats) {
+          const rowChar = seat.match(/^[A-Z]+/)[0];
+          const seatNum = seat.match(/\d+$/)[0];
+          
+          await db.request()
+            .input('sessionId', mssql.Int, sessionId)
+            .input('rowChar', mssql.VarChar, rowChar)
+            .input('seatNum', mssql.VarChar, seatNum)
+            .query(`
+              INSERT INTO tblBooking_Detail (
+                Session_lngSessionId, ScreenD_strPhyRowId, ScreenD_strSeatId, BookingD_strStatus, 
+                BookingD_intNextBookingNo, BookingD_intSequence, Area_bytNum, PGroup_strCode, 
+                Price_strCode, BookingD_intNoOfSeats, BookingD_curValue
+              ) VALUES (
+                @sessionId, @rowChar, @seatNum, 'P', 9999, 1, 1, '0001', '0001', 1, 250
+              )
+            `);
+        }
+        console.log(`[DATABASE SUCCESS] Saved booking seats directly in SQL Server table tblBooking_Detail for session ${sessionId}!`);
+      } catch (dbErr) {
+        console.warn('[DATABASE WARNING] Failed to persist booking directly in SQL Server table due to database constraints, falling back to memory storage. Details:', dbErr.message);
+      }
+    }
 
     console.log(`[SUCCESS] New Dynamic Booking Saved: ${bookingId} for film ${filmTitle}`);
 
