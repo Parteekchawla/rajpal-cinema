@@ -15,9 +15,6 @@
     "express": "^4.19.2",
     "mssql": "^12.5.4"
   },
-  "optionalDependencies": {
-    "msnodesqlv8": "^5.2.0"
-  },
   "devDependencies": {
     "nodemon": "^3.1.0"
   }
