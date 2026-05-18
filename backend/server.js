@@ -4,10 +4,25 @@ import alasql from 'alasql';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import mssql from 'mssql/msnodesqlv8.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Dynamically import standard mssql, and optionally the Windows-only msnodesqlv8 driver
+let mssql;
+try {
+  if (process.platform === 'win32') {
+    mssql = (await import('mssql/msnodesqlv8.js')).default;
+  } else {
+    mssql = (await import('mssql')).default;
+  }
+} catch (err) {
+  console.warn('[DATABASE WARNING] Could not load native Windows msnodesqlv8 driver, falling back to standard cross-platform tedious driver.', err.message);
+  try {
+    mssql = (await import('mssql')).default;
+  } catch (fallbackErr) {
+    console.error('[DATABASE ERROR] Failed to load standard cross-platform mssql dependency.', fallbackErr.message);
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
